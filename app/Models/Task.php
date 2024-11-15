@@ -38,21 +38,25 @@ class Task extends Model
     {
         static::updating(function ($task) {
             if ($task->isDirty('status')) {
-                $task->time ??= [];
+                $time = $task->time ?? [];
 
                 $startKey = "{$task->status}_starting";
                 $durationKey = "{$task->status}_duration";
 
-                if (isset($task->time[$startKey])) {
-                    $task->time[$durationKey] = now()->diffInSeconds($task->time[$startKey]);
+                if (isset($time[$startKey])) {
+                    $time[$durationKey] = now()->diffInSeconds($time[$startKey]);
                 }
 
                 if (in_array($task->status, ['mask_starting', 'cleaner_starting'])) {
-                    $task->time[$task->status] = now();
+                    $time[$task->status] = now();
                 }
+
+                // Сохранение изменений в массиве
+                $task->attributes['time'] = json_encode($time);
             }
         });
     }
+
 
 
     public function parentTask(): BelongsTo
