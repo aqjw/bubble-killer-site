@@ -18,11 +18,7 @@ class WebhookController extends Controller
         // Log::error('hasfile - ' . $request->hasFile('file'));
 
         // Проверка наличия задачи
-        $task = Task::where('segmentation_id', $taskId)->firstOrFail();
-        if (! $task) {
-            Log::error("Task with ID {$taskId} not found.");
-            return response()->json(['error' => 'Task not found'], 404);
-        }
+        $task = Task::findOrFail($taskId);
 
         // Обновление статуса задачи
         $task->status = $status;
