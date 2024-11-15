@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,13 +16,11 @@ class WebhookController extends Controller
         $taskId = $request->input('task_id');
         $status = $request->input('status');
 
-        // Log::error('hasfile - ' . $request->hasFile('file'));
-
         // Проверка наличия задачи
         $task = Task::findOrFail($taskId);
 
         // Обновление статуса задачи
-        $task->update(['status' => $status]);
+        rescue(fn () => $task->update(['status' => TaskStatus::fromName($status)]));
 
 
         if ($request->hasFile('mask')) {
@@ -32,7 +31,6 @@ class WebhookController extends Controller
         if ($request->hasFile('result')) {
             $request->file('result')->storeAs("uploads/{$task->id}", 'result.png', 'spaces');
             Log::info("Task {$taskId} result file received");
-
         }
 
         Log::info("Task {$taskId} status updated to {$status}");

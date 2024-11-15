@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\TaskStatus;
 use App\Jobs\ExtractSubtasksJob;
 use App\Models\Task;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -11,7 +13,7 @@ use ZipArchive;
 
 class TaskService
 {
-    public function create($file, string $modelName): Task
+    public function create(UploadedFile $file, string $modelName): Task
     {
         $isZip = $file->getClientOriginalExtension() === 'zip';
         $type = $isZip ? 'multiple' : 'single';
@@ -19,8 +21,10 @@ class TaskService
         // Создаем основную задачу
         $task = Task::create([
             'type' => $type,
-            'status' => 'pending',
+            'user_id' => auth()->id(),
+            'status' => TaskStatus::Pending,
             'cleaning_model' => $modelName,
+            'original_filename' => $file->getClientOriginalName(),
         ]);
 
         // Сохраняем файл и обрабатываем архив, если это ZIP
@@ -38,6 +42,7 @@ class TaskService
 
     public function extractAndCreateSubtasks(string $zipPath, string $parentId, string $modelName): void
     {
+        $task = Task::find($parentId);
         $segmentationService = app(SegmentationService::class);
         $zip = new ZipArchive;
         $localTaskDir = "uploads/{$parentId}";
@@ -67,37 +72,39 @@ class TaskService
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $filename = $zip->getNameIndex($i);
 
-            if (preg_match('/\.(jpg|jpeg|png|gif)$/i', $filename) && ! str_starts_with($filename, '__MACOSX')) {
-                $subtask = Task::create([
-                    'parent_id' => $parentId,
-                    'type' => 'single',
-                    'status' => 'pending',
-                    'cleaning_model' => $modelName,
-                    'original_filename' => $filename,
-                ]);
-                Log::info("Subtask created with ID: {$subtask->id}");
-
-                // Извлекаем файл и проверяем его существование
-                $subtaskDir = "uploads/{$subtask->id}";
-                Storage::makeDirectory($subtaskDir);
-                $zip->extractTo(storage_path("app/{$subtaskDir}"), $filename);
-
-                $extractedPath = storage_path("app/{$subtaskDir}/{$filename}");
-                if (! file_exists($extractedPath)) {
-                    Log::error("Failed to extract file: {$extractedPath}");
-                    continue;
-                }
-
-                // Загружаем в Spaces и удаляем локальный файл
-                Storage::disk('spaces')->put("{$subtaskDir}/original.png", file_get_contents($extractedPath));
-                Log::info("File uploaded to Spaces: {$subtaskDir}/original.png");
-                Storage::delete("{$subtaskDir}/{$filename}");
-
-                // Отправляем подзадачу на обработку
-                $segmentationService->send($subtask);
-            } else {
+            if (! preg_match('/\.(jpg|jpeg|png)$/i', $filename) || str_starts_with($filename, '__MACOSX')) {
                 Log::info("Skipping non-image or system file: {$filename}");
+                continue;
             }
+
+            $subtask = Task::create([
+                'user_id' => $task->user_id ?? null,
+                'parent_id' => $parentId,
+                'type' => 'single',
+                'status' => TaskStatus::Pending,
+                'cleaning_model' => $modelName,
+                'original_filename' => $filename,
+            ]);
+            Log::info("Subtask created with ID: {$subtask->id}");
+
+            // Извлекаем файл и проверяем его существование
+            $subtaskDir = "uploads/{$subtask->id}";
+            Storage::makeDirectory($subtaskDir);
+            $zip->extractTo(storage_path("app/{$subtaskDir}"), $filename);
+
+            $extractedPath = storage_path("app/{$subtaskDir}/{$filename}");
+            if (! file_exists($extractedPath)) {
+                Log::error("Failed to extract file: {$extractedPath}");
+                continue;
+            }
+
+            // Загружаем в Spaces и удаляем локальный файл
+            Storage::disk('spaces')->put("{$subtaskDir}/original.png", file_get_contents($extractedPath));
+            Log::info("File uploaded to Spaces: {$subtaskDir}/original.png");
+            Storage::delete("{$subtaskDir}/{$filename}");
+
+            // Отправляем подзадачу на обработку
+            $segmentationService->send($subtask);
         }
 
         // Закрываем архив и удаляем локальный ZIP

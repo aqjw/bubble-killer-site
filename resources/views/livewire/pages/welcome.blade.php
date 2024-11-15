@@ -6,5 +6,5 @@ layout('layouts.guest');
 ?>
 
 <div>
-    @livewire('image-upload-form')
+    @livewire('forms.image-upload-form')
 </div>

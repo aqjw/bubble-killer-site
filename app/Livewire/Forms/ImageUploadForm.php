@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Forms;
 
 use App\Services\TaskService;
 use Livewire\Component;
@@ -19,8 +19,20 @@ class ImageUploadForm extends Component
         'model' => 'required|string',
     ];
 
+    public $isLogged;
+
+    public function mount()
+    {
+        $this->isLogged = auth()->check();
+    }
+
     public function submit()
     {
+        if (! $this->isLogged && $this->file->getClientOriginalExtension() === 'zip') {
+            $this->addError('file', 'Only authorized users can upload ZIP files.');
+            return;
+        }
+
         $data = $this->validate();
         $taskService = app(TaskService::class);
         $task = $taskService->create($this->file, $data['model']);

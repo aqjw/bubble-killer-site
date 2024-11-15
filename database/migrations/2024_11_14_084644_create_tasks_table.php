@@ -15,11 +15,12 @@ return new class extends Migration
             $table->ulid('id', 36)->primary();
             $table->ulid('parent_id')->nullable()->index();
             $table->enum('type', ['single', 'multiple']);
-            $table->string('status', 20)->nullable()->index();
+            $table->unsignedTinyInteger('status')->index();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('cleaning_model');
             $table->string('original_filename')->nullable();
             $table->char('segmentation_id', 25)->nullable()->index();
-            $table->json('time')->nullable();
+            $table->json('execution_time')->nullable();
             $table->timestamps();
         });
     }

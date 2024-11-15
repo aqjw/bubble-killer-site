@@ -18,11 +18,6 @@
     >
         <!-- File Upload -->
         <div>
-            {{-- <label
-                for="file"
-                class="block text-gray-700"
-            >{{ __('Select Image') }}</label> --}}
-
             <div class="flex items-center my-1">
                 <label
                     class="relative overflow-hidden block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg cursor-pointer duration-100 hover:bg-gray-100 focus:outline-none"
@@ -79,7 +74,11 @@
                 <span class="px-1 py-0.5 bg-slate-200 rounded-md text-slate-600 text-xs">.jpeg</span>
                 <span class="px-1 py-0.5 bg-slate-200 rounded-md text-slate-600 text-xs">.jpg</span>
                 <span class="px-1 py-0.5 bg-slate-200 rounded-md text-slate-600 text-xs">.png</span>
-                <span class="px-1 py-0.5 bg-red-200 rounded-md text-red-600 text-xs">.zip</span>
+                <span
+                    class="px-1 py-0.5 rounded-md text-xs {{ $isLogged ? 'bg-slate-200 text-slate-600' : 'bg-red-200 text-red-600' }}"
+                >
+                    .zip
+                </span>
             </p>
             @error('file')
                 <span class="text-red-500">{{ $message }}</span>
@@ -88,11 +87,6 @@
 
         <!-- Model Selection (Styled to match file upload) -->
         <div>
-            {{-- <label
-                for="model"
-                class="block text-gray-700"
-            >{{ __('Select Model') }}</label> --}}
-
             <div class="flex items-center my-1 relative">
                 <label
                     class="block w-full px-4 py-2 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg cursor-pointer duration-100 hover:bg-gray-100 focus:outline-none"

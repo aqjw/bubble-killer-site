@@ -1,14 +1,13 @@
 <!-- resources/views/components/image-display.blade.php -->
-<div class="flex flex-wrap justify-center gap-8">
-    {{--  --}}
-    @foreach (['original' => 'Original', 'mask' => 'Mask', 'result' => 'Result'] as $key => $label)
-        <div class="w-64 p-4 bg-slate-300 rounded-lg shadow-lg">
+<div
+    class="flex justify-center divide-x-2 divide-gray-400 border-2 border-gray-400 rounded-lg shadow-lg overflow-hidden">
+    @foreach (['original' => 'Оригинал', 'mask' => 'Маска', 'result' => 'Результат'] as $key => $label)
+        @if (!empty($files[$key]))
             <img
-                src="{{ $files[$key] ?? '' }}"
+                src="{{ $files[$key] }}"
                 alt="{{ $label }}"
-                class="w-full h-64 object-cover rounded-md"
+                class="w-64 h-auto object-cover "
             >
-            <div class="text-center text-gray-700 mt-2 font-semibold">{{ $label }}</div>
-        </div>
+        @endif
     @endforeach
 </div>

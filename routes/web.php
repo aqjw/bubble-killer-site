@@ -16,7 +16,7 @@ Route::get('task/{task}', [TaskController::class, 'show'])
 
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
 
 Route::view('profile', 'profile')

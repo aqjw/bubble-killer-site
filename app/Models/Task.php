@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatus;
 use App\Services\SegmentationService;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -11,6 +12,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @property string $id
+ * @property TaskStatus $status
+ * @property array $execution_time
+ * @property array $files
+ * @property string $type
+ * @property string $cleaning_model
+ */
 class Task extends Model
 {
     use HasUuids;
@@ -19,44 +28,32 @@ class Task extends Model
 
     public $incrementing = false;
 
-
     protected $fillable = [
         'parent_id',
+        'user_id',
         'type',
-        'status', // pending mask_starting, mask_completed, cleaner_starting, cleaner_completed
+        'status',
         'cleaning_model',
         'original_filename',
         'segmentation_id',
-        'time',
+        'execution_time',
     ];
 
     protected $casts = [
-        'time' => 'array',
+        'status' => TaskStatus::class,
+        'execution_time' => 'array',
     ];
 
     protected static function booted()
     {
-        static::updating(function ($task) {
+        static::updating(function (self $task) {
             if ($task->isDirty('status')) {
-                $time = $task->time ?? [];
-
-                $startKey = "{$task->status}_starting";
-                $durationKey = "{$task->status}_duration";
-
-                if (isset($time[$startKey])) {
-                    $time[$durationKey] = now()->diffInSeconds($time[$startKey]);
-                }
-
-                if (in_array($task->status, ['mask_starting', 'cleaner_starting'])) {
-                    $time[$task->status] = now();
-                }
-
-                // Сохранение изменений в массиве
-                $task->attributes['time'] = json_encode($time);
+                $execution_time = $task->execution_time ?? [];
+                $execution_time[$task->status->getName()] = now();
+                $task->attributes['execution_time'] = json_encode($execution_time);
             }
         });
     }
-
 
 
     public function parentTask(): BelongsTo
@@ -69,17 +66,49 @@ class Task extends Model
         return $this->hasMany(Task::class, 'parent_id');
     }
 
-    public function getFilesAttribute()
+    public function files(): Attribute
     {
-        return [
-            'original' => Storage::url("uploads/{$this->id}/original.png"),
-            'mask' => Storage::url("uploads/{$this->id}/mask.png"),
-            'result' => Storage::url("uploads/{$this->id}/result.png"),
-        ];
+        return Attribute::make(
+            get: fn () => [
+                'original' => Storage::url("uploads/{$this->id}/original.png"),
+                'mask' => $this->status->hasMask() ? Storage::url("uploads/{$this->id}/mask.png") : null,
+                'result' => $this->status->hasResult() ? Storage::url("uploads/{$this->id}/result.png") : null,
+            ]
+        );
     }
 
-    public function getMultipleAttribute()
+    public function multiple(): Attribute
     {
-        return $this->type === 'multiple';
+        return Attribute::make(
+            get: fn () => $this->type === 'multiple'
+        );
+    }
+
+    public function maskTimeSeconds(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $start = $this->execution_time['mask_starting'] ?? null;
+                $end = $this->execution_time['mask_completed'] ?? null;
+
+                return $start && $end
+                    ? (strtotime($end) - strtotime($start))
+                    : null;
+            }
+        );
+    }
+
+    public function cleanTimeSeconds(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $start = $this->execution_time['cleaner_starting'] ?? null;
+                $end = $this->execution_time['cleaner_completed'] ?? null;
+
+                return $start && $end
+                    ? (strtotime($end) - strtotime($start))
+                    : null;
+            }
+        );
     }
 }
