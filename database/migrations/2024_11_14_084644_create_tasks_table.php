@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tasks', function (Blueprint $table) {
-            $table->ulid('id')->primary();
+            $table->ulid('id', 36)->primary();
             $table->ulid('parent_id')->nullable()->index();
             $table->enum('type', ['single', 'multiple']);
             $table->string('status', 20)->nullable()->index();
