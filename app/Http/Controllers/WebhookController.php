@@ -23,13 +23,16 @@ class WebhookController extends Controller
         // Обновление статуса задачи
         $task->update(['status' => $status]);
 
-        // Если передан файл, сохраняем его
-        if ($request->hasFile('result')) {
-            $request->file('result')->storeAs("uploads/{$task->id}", 'result.png', 'spaces');
-        }
 
         if ($request->hasFile('mask')) {
             $request->file('mask')->storeAs("uploads/{$task->id}", 'mask.png', 'spaces');
+            Log::info("Task {$taskId} mask file received");
+        }
+
+        if ($request->hasFile('result')) {
+            $request->file('result')->storeAs("uploads/{$task->id}", 'result.png', 'spaces');
+            Log::info("Task {$taskId} result file received");
+
         }
 
         Log::info("Task {$taskId} status updated to {$status}");
