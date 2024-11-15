@@ -1,7 +1,7 @@
 <!-- resources/views/components/image-display.blade.php -->
 <div class="flex flex-wrap justify-center gap-8">
-    {{-- 'mask' => 'Mask', --}}
-    @foreach (['original' => 'Original', 'result' => 'Result'] as $key => $label)
+    {{--  --}}
+    @foreach (['original' => 'Original', 'mask' => 'Mask', 'result' => 'Result'] as $key => $label)
         <div class="w-64 p-4 bg-slate-300 rounded-lg shadow-lg">
             <img
                 src="{{ $files[$key] ?? '' }}"
