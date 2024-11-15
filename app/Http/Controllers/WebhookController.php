@@ -21,8 +21,7 @@ class WebhookController extends Controller
         $task = Task::findOrFail($taskId);
 
         // Обновление статуса задачи
-        $task->status = $status;
-        $task->save();
+        $task->update(['status' => $status]);
 
         // Если передан файл, сохраняем его
         if ($request->hasFile('result')) {

@@ -38,18 +38,17 @@ class Task extends Model
     {
         static::updating(function ($task) {
             if ($task->isDirty('status')) {
-                $currentTime = now();
-                $task->time = $task->time ?? [];
+                $task->time ??= [];
 
                 $startKey = "{$task->status}_starting";
                 $durationKey = "{$task->status}_duration";
 
                 if (isset($task->time[$startKey])) {
-                    $task->time[$durationKey] = $currentTime->diffInSeconds($task->time[$startKey]);
+                    $task->time[$durationKey] = now()->diffInSeconds($task->time[$startKey]);
                 }
 
                 if (in_array($task->status, ['mask_starting', 'cleaner_starting'])) {
-                    $task->time[$task->status] = $currentTime;
+                    $task->time[$task->status] = now();
                 }
             }
         });
