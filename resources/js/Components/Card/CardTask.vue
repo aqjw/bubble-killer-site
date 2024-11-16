@@ -48,11 +48,11 @@ const props = defineProps({
                         </tr>
                         <tr>
                             <td class="opacity-70">Mask Time</td>
-                            <td>{{ task.mask_time_seconds || "-" }} сек</td>
+                            <td>{{ task.mask_time_seconds ?? "-" }} сек</td>
                         </tr>
                         <tr>
                             <td class="opacity-70">Clean Time</td>
-                            <td>{{ task.clean_time_seconds || "-" }} сек</td>
+                            <td>{{ task.clean_time_seconds ?? "-" }} сек</td>
                         </tr>
                     </tbody>
                 </v-table>
