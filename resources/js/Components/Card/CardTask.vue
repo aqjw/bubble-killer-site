@@ -48,21 +48,11 @@ const props = defineProps({
                         </tr>
                         <tr>
                             <td class="opacity-70">Mask Time</td>
-                            <td>
-                                <span v-if="task.mask_time_seconds">
-                                    {{ task.mask_time_seconds }} сек
-                                </span>
-                                <span v-else>–</span>
-                            </td>
+                            <td>{{ task.mask_time_seconds }} сек</td>
                         </tr>
                         <tr>
                             <td class="opacity-70">Clean Time</td>
-                            <td>
-                                <span v-if="task.clean_time_seconds">
-                                    {{ task.clean_time_seconds }} сек
-                                </span>
-                                <span v-else>–</span>
-                            </td>
+                            <td>{{ task.clean_time_seconds }} сек</td>
                         </tr>
                     </tbody>
                 </v-table>
