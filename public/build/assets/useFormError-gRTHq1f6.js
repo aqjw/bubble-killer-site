@@ -1,0 +1,1 @@
+const c=s=>{const e=r=>{delete s.errors[r]},t=r=>s.errors[r],n=r=>{if(r instanceof RegExp){for(const o in s.errors)if(r.test(o))return!0}else return!!s.errors[r];return!1};return{clearError:e,hasError:n,getError:t,errorAttributes:r=>n(r)?{class:"show-details",errorMessages:t(r),onFocus:()=>e(r)}:{}}};export{c as u};
