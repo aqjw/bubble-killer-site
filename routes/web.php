@@ -23,7 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::post('api/webhook/processing', [WebhookController::class, 'processing'])->name('api.webhook.processing');
+Route::post('api/webhook/processing/{task}', [WebhookController::class, 'processing'])->name('api.webhook.processing');
 
 require __DIR__ . '/upi.php';
 require __DIR__ . '/auth.php';

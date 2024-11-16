@@ -10,30 +10,25 @@ use Illuminate\Support\Facades\Storage;
 
 class WebhookController extends Controller
 {
-    public function processing(Request $request)
+    public function processing(Task $task, Request $request)
     {
         // Получаем параметры из запроса
-        $taskId = $request->input('task_id');
         $status = $request->input('status');
-
-        // Проверка наличия задачи
-        $task = Task::findOrFail($taskId);
 
         // Обновление статуса задачи
         rescue(fn () => $task->update(['status' => TaskStatus::fromName($status)]));
 
-
         if ($request->hasFile('mask')) {
             $request->file('mask')->storeAs("uploads/{$task->id}", 'mask.png', 'spaces');
-            Log::info("Task {$taskId} mask file received");
+            Log::info("Task {$task->id} mask file received");
         }
 
         if ($request->hasFile('result')) {
             $request->file('result')->storeAs("uploads/{$task->id}", 'result.png', 'spaces');
-            Log::info("Task {$taskId} result file received");
+            Log::info("Task {$task->id} result file received");
         }
 
-        Log::info("Task {$taskId} status updated to {$status}");
+        Log::info("Task {$task->id} status updated to {$status}");
 
         return response()->json('ok');
     }
