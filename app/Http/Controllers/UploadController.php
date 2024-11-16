@@ -45,9 +45,9 @@ class UploadController extends Controller
         }
 
         if (! $user) {
-            return to_route('task', $tasks[0]);
+            return to_route('tasks.show', $tasks[0]);
         }
 
-        return to_route('history');
+        return to_route('tasks.index');
     }
 }

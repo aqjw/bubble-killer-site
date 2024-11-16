@@ -28,9 +28,9 @@ const props = defineProps({
                         {{ task.original_filename }}
                     </h1>
 
-                    <div>
+                    <div class="space-y-2">
                         <v-chip size="small">ID: {{ task.id }}</v-chip>
-                        <div class="text-xs opacity-70 italic mt-2">
+                        <div class="text-xs opacity-70 italic">
                             Загружено
                             {{
                                 DateManager.toHuman(task.created_at, {
@@ -38,6 +38,9 @@ const props = defineProps({
                                 })
                             }}
                             назад
+                        </div>
+                        <div class="text-xs opacity-70 italic">
+                            Всего файлов в архиве {{ task.subtasks.length }}
                         </div>
                     </div>
                 </div>
@@ -55,7 +58,9 @@ const props = defineProps({
                     v-for="item in task.subtasks"
                     :key="item.id"
                     :task="item"
-                    @click.stop.prevent="$inertia.visit(route('task', item.id))"
+                    @click.stop.prevent="
+                        $inertia.visit(route('tasks.show', item.id))
+                    "
                 />
             </div>
         </div>
@@ -63,7 +68,7 @@ const props = defineProps({
         <div v-else>
             <v-btn
                 v-if="task.parent_id"
-                :to="route('task', task.parent_id)"
+                :to="route('tasks.show', task.parent_id)"
                 variant="tonal"
                 class="text-none mb-4"
                 color="primary"

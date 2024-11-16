@@ -11,16 +11,15 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-
-    public function __invoke(Task $task)
+    public function index()
     {
-        return Inertia::render('Task', [
-            'task' => new TaskResource($task),
-        ]);
+        return Inertia::render('Tasks/Index');
     }
 
-    public function history()
+    public function show(Task $task)
     {
-        return Inertia::render('History');
+        return Inertia::render('Tasks/Show', [
+            'task' => new TaskResource($task),
+        ]);
     }
 }

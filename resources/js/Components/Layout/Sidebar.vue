@@ -17,9 +17,9 @@ const items = ref([
     },
     {
         label: "История",
-        href: route("history"),
+        href: route("tasks.index"),
         icon: "mdi-history",
-        isActive: () => route().current("history"),
+        isActive: () => route().current("tasks.index"),
         action: (e, item) => onAction(e, item),
     },
 ]);

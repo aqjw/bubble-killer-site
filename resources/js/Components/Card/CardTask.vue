@@ -25,15 +25,6 @@ const props = defineProps({
                             <td class="opacity-70">Файл</td>
                             <td class="truncate max-w-12">
                                 {{ task.original_filename }}
-                                <v-chip
-                                    v-if="task.type === 'multiple'"
-                                    density="compact"
-                                    color="primary"
-                                    size="small"
-                                    class="ml-2"
-                                >
-                                    {{ task.subtasks.length }}
-                                </v-chip>
                             </td>
                         </tr>
                         <tr>
@@ -79,7 +70,15 @@ const props = defineProps({
 
             <div class="w-2/3 flex justify-end">
                 <div v-if="task.type === 'multiple'">
-                    <v-list lines="one" max-height="15rem">
+                    <div class="-mt-3 text-sm italic opacity-70 mb-1">
+                        Всего файлов в архиве {{ task.subtasks.length }}
+                    </div>
+
+                    <v-list
+                        lines="one"
+                        max-height="16rem"
+                        class="border rounded-lg !bg-white"
+                    >
                         <v-list-item
                             v-for="(item, index) in task.subtasks"
                             :key="index"

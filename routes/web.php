@@ -10,12 +10,13 @@ use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
 Route::post('upload', UploadController::class)->name('upload');
-Route::get('task/{task}', TaskController::class)->name('task');
 
+Route::prefix('tasks')->as('tasks.')->group(function () {
+    Route::get('', [TaskController::class, 'index'])->name('index')->middleware('auth');
+    Route::get('{task}', [TaskController::class, 'show'])->name('show');
+});
 
 Route::middleware('auth')->group(function () {
-    Route::get('history', [TaskController::class, 'history'])->name('history');
-
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

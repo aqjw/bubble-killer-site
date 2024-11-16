@@ -58,7 +58,9 @@ onBeforeUnmount(() => {
                     v-for="(task, index) in items"
                     :key="index"
                     :task="task"
-                    @click.stop.prevent="$inertia.visit(route('task', task.id))"
+                    @click.stop.prevent="
+                        $inertia.visit(route('tasks.show', task.id))
+                    "
                 />
             </div>
         </InfiniteScroll>
