@@ -2,4 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  [type='text'],
+  input:where(:not([type])),
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select,
+  textarea,
+  select {
+    background-color: transparent;
+    font-size: 0.875rem;
+    box-shadow: none !important;
+  }
+}
 
+.bg-main {
+  @apply bg-gray-100 dark:bg-neutral-900 duration-100;
+}
+
+/* TODO: rename */
+.bg-second {
+  background-color: rgb(var(--v-theme-surface));
+}
+
+.noti-badge {
+  .v-badge__badge {
+    font-size: 0.7rem !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    padding: 0 4px !important;
+  }
+}
+
+.absolute-center {
+  @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.v-overlay__scrim {
+  @apply dark:!bg-neutral-900;
+}
+
+.text-field-compact {
+  @apply h-8;
+  .v-field {
+    @apply h-8 !p-0;
+
+    .v-field-label {
+      @apply text-sm;
+    }
+
+    .v-field__input {
+      @apply min-h-8 !py-0;
+    }
+  }
+}
+
+.carousel__prev {
+  transform: translateX(-60%) translateY(-50%) !important;
+}
+.carousel__next {
+  transform: translateX(60%) translateY(-50%) !important;
+}
+.carousel__prev,
+.carousel__next {
+  @apply !m-0 !bg-slate-300 dark:!bg-slate-100;
+  --vc-nav-border-radius: 3rem;
+  --vc-icn-width: 3em;
+  --vc-nav-width: 3rem;
+  --vc-nav-height: 3rem;
+}
+.carousel__liveregion {
+    @apply hidden;
+}
+
+.v-list {
+  &.no-lines .v-list-item {
+    @apply min-h-0;
+  }
+  &.spacerless .v-list-item__spacer {
+    @apply !w-4;
+  }
+}
+
+blockquote {
+  border-left: 2px solid #999;
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+}
+
+.divider-vertical {
+  @apply w-px bg-stone-300 dark:bg-stone-600;
+}
+
+.divider-horizontal {
+  @apply h-px bg-stone-300 dark:bg-stone-600;
+}
+
+.v-chip.chip-content-full {
+  @apply w-full !px-1;
+
+  .v-chip__content {
+    @apply w-full inline-block;
+  }
+}
+
+.break-anywhere {
+  overflow-wrap: anywhere;
+}
+
+.v-timeline-item__body {
+  @apply !pl-2 w-full text-left;
+}
+
+.link {
+  padding-bottom: 1px;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0% 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.3s;
+
+  &:hover {
+    background-size: 100% 1px;
+  }
+}
+
+.v-input {
+  .v-input__details {
+    min-height: 0;
+    max-height: 0;
+    padding-top: 0;
+    transition: max-height 0.3s ease-out, padding-top 0.3s ease-out;
+    @apply line-clamp-2;
+  }
+  &.show-details {
+    .v-input__details {
+      max-height: 40px;
+      padding-top: 6px;
+      transition: max-height 0.3s ease-in, padding-top 0.3s ease-in;
+    }
+  }
+}
+
+.border-px {
+    @apply border;
+}
+
+.roundless .v-avatar {
+    @apply !rounded-md border-[0.5px] border-black shadow-md;
+}

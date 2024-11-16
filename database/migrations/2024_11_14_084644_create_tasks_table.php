@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('cleaning_model');
             $table->string('original_filename')->nullable();
-            $table->char('segmentation_id', 25)->nullable()->index();
             $table->json('execution_time')->nullable();
             $table->timestamps();
         });

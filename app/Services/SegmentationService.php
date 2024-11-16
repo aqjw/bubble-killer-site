@@ -16,7 +16,7 @@ class SegmentationService
     public function send(Task $task)
     {
         // Validate if original file exists
-        if (blank($task->files['original'])) {
+        if (blank($task->originalUrl)) {
             Log::warning("Task {$task->id} has no original file.");
             return;
         }
@@ -27,7 +27,7 @@ class SegmentationService
             // Send POST request to AI model
             $response = Http::post("{$domain}/process", [
                 'task_id' => $task->id,
-                'image_url' => $task->files['original'], // S3/Spaces URL
+                'image_url' => $task->originalUrl, // S3/Spaces URL
                 'cleaning_model' => $task->cleaning_model,
                 // 'webhook_url' => route('api.webhook.processing', $task->id),
                 'webhook_url' => 'http://127.0.0.1:8000/api/webhook/processing/' . $task->id,

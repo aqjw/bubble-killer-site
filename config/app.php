@@ -1,6 +1,21 @@
 <?php
 
 return [
+    'cleaner_models' => [
+        'lama',
+        'ldm',
+        'zits',
+        'mat',
+        'fcf',
+        'sd1.5',
+        'anything4',
+        'realisticVision1.4',
+        'cv2',
+        'manga',
+        'sd2',
+        'paint_by_example',
+        'instruct_pix2pix'
+    ],
 
     /*
     |--------------------------------------------------------------------------

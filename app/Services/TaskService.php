@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\TaskStatus;
 use App\Jobs\ExtractSubtasksJob;
 use App\Models\Task;
+use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -34,7 +36,7 @@ class TaskService
         } else {
             $file->storeAs("uploads/{$task->id}", 'original.png', 'spaces');
             $segmentationService = app(SegmentationService::class);
-            $segmentationService->send($task);
+            rescue(fn () => $segmentationService->send($task));
         }
 
         return $task;
@@ -104,12 +106,22 @@ class TaskService
             Storage::delete("{$subtaskDir}/{$filename}");
 
             // Отправляем подзадачу на обработку
-            $segmentationService->send($subtask);
+            rescue(fn () => $segmentationService->send($subtask));
         }
 
         // Закрываем архив и удаляем локальный ZIP
         $zip->close();
         Storage::delete($localZipPath);
         Log::info("ZIP file deleted from local storage: {$localZipPath}");
+    }
+
+    public function get(User $user, int $limit = 10): LengthAwarePaginator
+    {
+        return $user
+            ->tasks()
+            ->with('subtasks')
+            ->whereNull('parent_id')
+            ->latest()
+            ->paginate($limit);
     }
 }

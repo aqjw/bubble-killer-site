@@ -1,26 +1,26 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
-use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\UploadController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
+use Inertia\Inertia;
 
-Route::post('api/webhook/processing/{task}', [WebhookController::class, 'processing'])
-    ->name('api.webhook.processing');
-
-Volt::route('', 'pages.welcome')
-    ->name('welcome');
-
-Route::get('task/{task}', [TaskController::class, 'show'])
-    ->name('task');
+Route::get('/', HomeController::class)->name('home');
+Route::post('upload', UploadController::class)->name('upload');
+Route::get('task/{task}', TaskController::class)->name('task');
 
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth'])
-    ->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('history', [TaskController::class, 'history'])->name('history');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
+
+require __DIR__ . '/upi.php';
 require __DIR__ . '/auth.php';

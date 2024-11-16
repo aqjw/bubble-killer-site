@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Storage;
  * @property array $files
  * @property string $type
  * @property string $cleaning_model
+ * @property string $originalUrl
+ * @property ?string $parent_id
+ * @property string $original_filename
+ * @property ?int $maskTimeSeconds
+ * @property ?int $cleanTimeSeconds
  */
 class Task extends Model
 {
@@ -35,7 +40,6 @@ class Task extends Model
         'status',
         'cleaning_model',
         'original_filename',
-        'segmentation_id',
         'execution_time',
     ];
 
@@ -55,7 +59,6 @@ class Task extends Model
         });
     }
 
-
     public function parentTask(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'parent_id');
@@ -69,11 +72,11 @@ class Task extends Model
     public function files(): Attribute
     {
         return Attribute::make(
-            get: fn () => [
-                'original' => Storage::url("uploads/{$this->id}/original.png"),
-                'mask' => $this->status->hasMask() ? Storage::url("uploads/{$this->id}/mask.png") : null,
-                'result' => $this->status->hasResult() ? Storage::url("uploads/{$this->id}/result.png") : null,
-            ]
+            get: fn () => array_filter([
+                Storage::url("uploads/{$this->id}/original.png"),
+                $this->status->hasMask() ? Storage::url("uploads/{$this->id}/mask.png") : null,
+                $this->status->hasResult() ? Storage::url("uploads/{$this->id}/result.png") : null,
+            ])
         );
     }
 
@@ -109,6 +112,13 @@ class Task extends Model
                     ? (strtotime($end) - strtotime($start))
                     : null;
             }
+        );
+    }
+
+    public function originalUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Storage::url("uploads/{$this->id}/original.png"),
         );
     }
 }
