@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-// import 'vue3-carousel/dist/carousel.css';
+import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Navigation } from "vue3-carousel";
 
 defineProps({
