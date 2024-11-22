@@ -1,7 +1,7 @@
 <script setup>
 import { storeToRefs, useUserStore } from "@/Stores";
-import { ref } from "vue";
 import { router } from "@inertiajs/vue3"; // Для перенаправления на страницу входа
+import { ref } from "vue";
 
 const props = defineProps({
     modelValue: {
@@ -19,7 +19,7 @@ const emit = defineEmits(["update:modelValue"]);
 const userStore = useUserStore();
 const { isLogged } = storeToRefs(userStore);
 
-const acceptedFormats = [".jpeg", ".jpg", ".png", ".zip"];
+const acceptedFormats = [".jpeg", ".png", ".zip"];
 const isDragging = ref(false);
 
 const addFiles = (fileList) => {
@@ -77,17 +77,16 @@ const handleZipClick = () => {
             <span class="text-red-600 font-semibold"> Single file only </span>
         </p>
 
-        <p class="text-sm text-gray-500 flex gap-1 mb-2">
-            Accepted formats:
-            <span
+        <p class="text-sm text-gray-500 flex flex-wrap gap-1 mb-2">
+            <div>Accepted formats:</div>
+
+            <v-chip
                 v-for="format in acceptedFormats"
                 :key="format"
-                class="px-1 py-0.5 rounded-md text-xs"
-                :class="{
-                    'bg-slate-200 text-slate-600':
-                        isLogged || format !== '.zip',
-                    'bg-red-200 text-red-600': !isLogged && format === '.zip',
-                }"
+                density="comfortable"
+                size="small"
+                label
+                :color="isLogged || format !== '.zip' ? null : 'red'"
             >
                 <v-tooltip
                     v-if="!isLogged && format === '.zip'"
@@ -97,7 +96,18 @@ const handleZipClick = () => {
                     Only authorized users can upload ZIP files.
                 </v-tooltip>
                 {{ format }}
-            </span>
+            </v-chip>
+        </p>
+
+        <p class="text-sm text-gray-500 flex gap-1 mb-2">
+            <div>Limits:</div>
+
+            <v-chip density="comfortable" size="small" label color="deep-orange">
+                10MB
+            </v-chip>
+            <v-chip density="comfortable" size="small" label color="deep-orange">
+                50 Files
+            </v-chip>
         </p>
 
         <!-- Форма загрузки -->

@@ -30,12 +30,18 @@ function toggleTheme() {
     <v-app-bar flat density="comfortable" class="!shadow-">
         <v-container>
             <v-row>
-                <v-col cols="2" class="d-flex align-center">
+                <v-col cols="2" class="d-flex align-center relative">
                     <Link
                         :href="route('home')"
                         class="text-2xl font-semibold mr-10 text-zinc-800 dark:text-zinc-200 no-underline"
                     >
                         {{ $appName }}
+
+                        <div class="absolute top-0 right-0">
+                            <v-chip density="comfortable" color="purple">
+                                Beta
+                            </v-chip>
+                        </div>
                     </Link>
                 </v-col>
 

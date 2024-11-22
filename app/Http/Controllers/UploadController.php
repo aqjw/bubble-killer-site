@@ -13,7 +13,7 @@ class UploadController extends Controller
     public function __invoke(Request $request, TaskService $taskService): RedirectResponse
     {
         $request->validate([
-            'files' => ['required', 'array'],
+            'files' => ['required', 'array', 'max:10'],
             'files.*' => ['file', 'mimes:jpeg,png,jpg,zip', 'max:10240'],
             'model' => ['required', 'string', 'in:' . implode(',', config('app.cleaner_models'))],
         ]);
