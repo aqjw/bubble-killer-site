@@ -111,6 +111,7 @@ const handleZipClick = () => {
             @dragover="handleDragOver"
             @dragleave="handleDragLeave"
             @drop="handleDrop"
+            @click="!isLogged && redirectToLogin"
         >
             <input
                 id="fileInput"
@@ -119,7 +120,6 @@ const handleZipClick = () => {
                 @change="handleFileChange"
                 accept=".jpeg,.jpg,.png,.zip"
                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                @click="!isLogged && redirectToLogin"
             />
 
             <div class="flex flex-col items-center justify-center">

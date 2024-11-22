@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->ulid('id', 36)->primary();
-            $table->ulid('parent_id')->nullable()->index();
+            $table->ulid('parent_id', 36)->nullable()->index();
             $table->enum('type', ['single', 'multiple']);
             $table->unsignedTinyInteger('status')->index();
             $table->unsignedBigInteger('user_id')->nullable()->index();
