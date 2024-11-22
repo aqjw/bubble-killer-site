@@ -10,8 +10,6 @@
 
     <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-    <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-
     <!-- Fonts -->
     <link
         rel="preconnect"

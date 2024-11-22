@@ -38,7 +38,12 @@ function toggleTheme() {
                         {{ $appName }}
 
                         <div class="absolute top-0 right-0">
-                            <v-chip density="comfortable" color="purple">
+                            <v-chip
+                                density="comfortable"
+                                size="small"
+                                color="purple"
+                                variant="elevated"
+                            >
                                 Beta
                             </v-chip>
                         </div>

@@ -5,12 +5,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Middleware\DynamicThrottle;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
-Route::post('upload', UploadController::class)->name('upload');
+Route::post('upload', UploadController::class)
+    ->name('upload')
+    ->middleware(DynamicThrottle::class);
 
 Route::prefix('tasks')->as('tasks.')->group(function () {
     Route::get('', [TaskController::class, 'index'])->name('index')->middleware('auth');
