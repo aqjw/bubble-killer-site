@@ -67,7 +67,7 @@ const props = defineProps({
                     <v-list
                         lines="one"
                         max-height="16rem"
-                        class="border rounded-lg !bg-white"
+                        class="border rounded-lg"
                     >
                         <v-list-item
                             v-for="(item, index) in task.subtasks"
