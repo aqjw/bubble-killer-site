@@ -76,7 +76,7 @@ const props = defineProps({
                             :prepend-avatar="item.files[0]"
                             class="roundless"
                             @click.stop.prevent="
-                                $inertia.visit(route('task', item.id))
+                                $inertia.visit(route('tasks.show', item.id))
                             "
                         >
                             <v-chip class="mb-3" size="small" density="compact">
