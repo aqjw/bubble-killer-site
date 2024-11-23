@@ -121,4 +121,18 @@ class Task extends Model
             get: fn () => Storage::url("uploads/{$this->id}/original.png"),
         );
     }
+
+    public function maskUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Storage::url("uploads/{$this->id}/mask.png"),
+        );
+    }
+
+    public function resultUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Storage::url("uploads/{$this->id}/result.png"),
+        );
+    }
 }
