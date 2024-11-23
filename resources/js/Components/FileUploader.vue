@@ -25,7 +25,7 @@ const isDragging = ref(false);
 const addFiles = (fileList) => {
     const selectedFiles = Array.from(fileList);
     const validFiles = selectedFiles.filter((file) =>
-        acceptedFormats.includes(file.name.slice(file.name.lastIndexOf(".")))
+        acceptedFormats.includes(file.name.slice(file.name.lastIndexOf(".")).toLowerCase())
     );
 
     let newFiles = isLogged.value
