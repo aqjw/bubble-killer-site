@@ -40,7 +40,15 @@ const props = defineProps({
                         </tr>
                         <tr>
                             <td class="opacity-70">Статус</td>
-                            <td>{{ task.status }}</td>
+                            <td>
+                                {{ task.status }}
+                                <v-progress-circular
+                                    v-if="task.status != 'cleaner_completed'"
+                                    indeterminate
+                                    :size="20"
+                                    :width="2"
+                                />
+                            </td>
                         </tr>
                         <tr>
                             <td class="opacity-70">Model</td>

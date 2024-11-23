@@ -80,7 +80,7 @@ const createObjectURL = (path) => {
                             class="bg-zinc-200 rounded-md h-fit !sticky top-[4.5rem]"
                             rounded="lg"
                             :elevation="4"
-                            :loading="form.progress"
+                            :loading="form.processing"
                         >
                             <div
                                 class="w-80 flex flex-col gap-4 justify-end p-6"

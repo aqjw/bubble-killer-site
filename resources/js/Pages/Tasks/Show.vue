@@ -2,7 +2,8 @@
 import CardTask from "@/Components/Card/CardTask.vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import DateManager from "@/Plugins/DateManager";
-import { Head } from "@inertiajs/vue3";
+import { Head, router } from "@inertiajs/vue3";
+import { onMounted } from "vue";
 
 const props = defineProps({
     task: {
@@ -10,7 +11,15 @@ const props = defineProps({
         required: true,
     },
 });
-//
+
+onMounted(() => {
+    console.log("props.task.status", props.task.status);
+    if (props.task.status != "cleaner_completed") {
+        setTimeout(() => {
+            router.visit(route("tasks.show", props.task.id));
+        }, 10000);
+    }
+});
 </script>
 
 <template>
