@@ -6,9 +6,17 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Middleware\DynamicThrottle;
+use App\Models\MangaChapter;
+use App\Services\ProcessService;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::get('/test', function () {
+    $mangaChapter = MangaChapter::find(12);
+    $success = app(ProcessService::class)->processBubbleMask($mangaChapter);
+});
+
 
 Route::get('/', HomeController::class)->name('home');
 Route::post('upload', UploadController::class)
