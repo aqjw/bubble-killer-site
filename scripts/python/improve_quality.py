@@ -1,9 +1,10 @@
-# split.py
+# bubble_mask.py
 
 import argparse
 import os
-from split.splitter import split_images
+from improve_quality.predict import process_folder
 from utils.json_wrapper import get_json
+
 
 def parse_arguments():
     """
@@ -12,8 +13,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Process manga chapters.")
     parser.add_argument('--input', type=str, required=True, help="Path to input folder.")
     parser.add_argument('--output', type=str, required=True, help="Path to output folder.")
-    parser.add_argument('--min_width', type=int, default=100, help="Minimum width for saving segment.")
-    parser.add_argument('--min_height', type=int, default=100, help="Minimum height for saving segment.")
     return parser.parse_args()
 
 
@@ -22,16 +21,16 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     # Extract arguments
-    dir_input = args.input
-    dir_output = args.output
-    min_dimensions = (args.min_width, args.min_height)
+    input_dir = args.input
+    output_dir = args.output
 
     # Process the folder
-    files = split_images(dir_input, dir_output, min_dimensions)
+    # process_folder(input_dir, input_files, output_dir)
+
+    f"python -m waifu2x.cli --tune animation --style art -n 3 -m noise_scale2x -i {input_dir} -o {output_dir}"
 
     # Generate and print JSON result
     result = get_json({
         'status': 'success',
-        'files': files,
     })
     print(result)

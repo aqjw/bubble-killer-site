@@ -14,6 +14,8 @@ class SplitImagesJob implements ShouldQueue
 {
     use Queueable;
 
+    public $timeout = 3600;
+
     /**
      * Create a new job instance.
      */

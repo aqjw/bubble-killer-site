@@ -1,12 +1,10 @@
 # bubble_mask.py
 
 import argparse
-import sys
 import os
-from bubble_mask.predict import process_folder
+from mask.bubble import process_folder
 from utils.json_wrapper import get_json
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 def parse_arguments():
     """

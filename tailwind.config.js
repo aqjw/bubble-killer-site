@@ -18,9 +18,6 @@ export default {
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
             },
-            cursor: {
-                circle: "url(data:image/svg+xml;base64,<base64-код SVG круга>), auto",
-            },
         },
     },
 

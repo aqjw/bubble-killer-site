@@ -13,7 +13,15 @@
         </div>
 
         @foreach ($this->items as $key => $item)
-            @livewire(\App\Livewire\MaskVerification::class, $item, key($key))
+            @livewire(
+                \App\Livewire\ToggleComponent::class,
+                [
+                    'item' => $item,
+                    'key' => $key,
+                    'component' => $item['remask'] ? 'mask' : 'clear',
+                ],
+                key($key)
+            )
         @endforeach
     </form>
 </x-filament-panels::page>

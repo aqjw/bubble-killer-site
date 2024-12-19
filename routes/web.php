@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/test', function () {
-    $mangaChapter = MangaChapter::find(12);
-    $success = app(ProcessService::class)->processBubbleMask($mangaChapter);
+    $mangaChapter = MangaChapter::find(14);
+    $success = app(ProcessService::class)->processFrameMask($mangaChapter);
 });
 
 

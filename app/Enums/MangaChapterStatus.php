@@ -27,26 +27,28 @@ enum MangaChapterStatus: int implements HasLabel, HasColor
     // Step 5: Creating masks (AI)
     case MaskCreation = 5;
 
+    case QualityImprovement = 6;
+
     // Step 6: Checking and correcting masks (human)
-    case MaskVerification = 6;
+    case MaskVerification = 7;
 
     // Step 7: Removing bubbles (AI)
-    case BubbleRemoval = 7;
+    case BubbleRemoval = 8;
 
-    // Step 8: Rechecking and recreating masks if needed (human)
-    case MaskRecreation = 8;
+    // Step 8: Checking and correcting image clearing (human)
+    case ClearVerification = 9;
 
     // Step 9: Creating masks for cropped frames (AI)
-    case FrameMaskCreation = 9;
+    case FrameMaskCreation = 10; // TODO: остановился на этом шаге.
 
     // Step 10: Verifying frame masks
-    case FrameMaskVerification = 10;
+    case FrameMaskVerification = 11;
 
     // Step 11: Cropping frame images
-    case FrameCropping = 11;
+    case FrameCropping = 12;
 
     // Step 12: Processing completed
-    case Finalized = 12;
+    case Finalized = 13;
 
     /**
      * Maps statuses to human-readable keys.
@@ -59,9 +61,10 @@ enum MangaChapterStatus: int implements HasLabel, HasColor
             'image_splitting' => self::ImageSplitting,
             'image_filtering' => self::ImageFiltering,
             'mask_creation' => self::MaskCreation,
+            'quality_improvement' => self::QualityImprovement,
             'mask_verification' => self::MaskVerification,
             'bubble_removal' => self::BubbleRemoval,
-            'mask_recreation' => self::MaskRecreation,
+            'clear_verification' => self::ClearVerification,
             'frame_mask_creation' => self::FrameMaskCreation,
             'frame_mask_verification' => self::FrameMaskVerification,
             'frame_cropping' => self::FrameCropping,
@@ -76,10 +79,11 @@ enum MangaChapterStatus: int implements HasLabel, HasColor
             self::ImageParsing->value => 'Parsing Images',
             self::ImageSplitting->value => 'Splitting Images',
             self::ImageFiltering->value => 'Filtering Unnecessary Images',
+            self::QualityImprovement->value => 'Quality Improvement',
             self::MaskCreation->value => 'Creating Masks',
             self::MaskVerification->value => 'Mask Verification',
             self::BubbleRemoval->value => 'Removing Bubbles',
-            self::MaskRecreation->value => 'Mask Recreation',
+            self::ClearVerification->value => 'Clear Verification',
             self::FrameMaskCreation->value => 'Creating Frame Masks',
             self::FrameMaskVerification->value => 'Verifying Frame Masks',
             self::FrameCropping->value => 'Reviewing Cropped Images',
@@ -94,10 +98,11 @@ enum MangaChapterStatus: int implements HasLabel, HasColor
             self::ImageParsing->value => Color::Blue,
             self::ImageSplitting->value => Color::Cyan,
             self::ImageFiltering->value => Color::Slate,
+            self::QualityImprovement->value => Color::Indigo,
             self::MaskCreation->value => Color::Indigo,
             self::MaskVerification->value => Color::Yellow,
             self::BubbleRemoval->value => Color::Red,
-            self::MaskRecreation->value => Color::Orange,
+            self::ClearVerification->value => Color::Orange,
             self::FrameMaskCreation->value => Color::Violet,
             self::FrameMaskVerification->value => Color::Fuchsia,
             self::FrameCropping->value => Color::Emerald,

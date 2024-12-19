@@ -27,24 +27,18 @@ class FileRegistrationService
                 continue;
             }
 
-            if (Media::where('file_name', $fileName)->where('collection_name', $collectionName)->exists()) {
+            $record_exists = $model->media()->where('file_name', $fileName)->where('collection_name', $collectionName)->exists();
+            if ($record_exists) {
                 continue;
             }
 
-            Media::create([
-                'model_type' => get_class($model),
-                'model_id' => $model->id,
+            $model->media()->create([
                 'collection_name' => $collectionName,
                 'name' => pathinfo($fileName, PATHINFO_FILENAME),
                 'file_name' => $fileName,
                 'mime_type' => File::mimeType($filePath),
                 'disk' => $disk,
                 'size' => File::size($filePath),
-                'manipulations' => [],
-                'custom_properties' => [],
-                'generated_conversions' => [],
-                'responsive_images' => [],
-                'order_column' => null,
             ]);
         }
     }

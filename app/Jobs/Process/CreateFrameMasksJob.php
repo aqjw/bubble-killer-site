@@ -6,10 +6,11 @@ use App\Enums\MangaChapterStatus;
 use App\Models\Manga;
 use App\Models\MangaChapter;
 use App\Services\Parsers\MangalibParser;
+use App\Services\ProcessService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-class ParseImagesJob implements ShouldQueue
+class CreateFrameMasksJob implements ShouldQueue
 {
     use Queueable;
 
@@ -30,18 +31,12 @@ class ParseImagesJob implements ShouldQueue
     public function handle(): void
     {
         $mangaChapter = MangaChapter::find($this->mangaChapterId);
-        $mangaChapter->update(['status' => MangaChapterStatus::ImageParsing]);
-        $success = false;
+        $mangaChapter->update(['status' => MangaChapterStatus::FrameMaskCreation]);
 
-        if ($mangaChapter->manga->slug_mangalib) {
-            $success = rescue(function () use ($mangaChapter) {
-                app(MangalibParser::class)->handle($mangaChapter);
-                return true;
-            }, rescue: false);
-        }
+        $success = app(ProcessService::class)->processFrameMask($mangaChapter);
 
         if ($success) {
-            dispatch(new SplitImagesJob(mangaChapterId: $mangaChapter->id));
+            $mangaChapter->update(['status' => MangaChapterStatus::FrameMaskVerification]);
         }
     }
 }

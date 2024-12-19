@@ -75,6 +75,11 @@ class MangaChapterResource extends Resource
                     ->visible(fn ($record) => MangaChapterStatus::MaskVerification->is($record->status))
                     ->action(fn ($record) => redirect(self::getUrl('mask-verification', ['record' => $record]))),
 
+                Tables\Actions\Action::make('clear-verification')
+                    ->label('Clear Verification')
+                    ->visible(fn ($record) => MangaChapterStatus::ClearVerification->is($record->status))
+                    ->action(fn ($record) => redirect(self::getUrl('clear-verification', ['record' => $record]))),
+
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                 ])
@@ -101,6 +106,7 @@ class MangaChapterResource extends Resource
             'edit' => Pages\EditMangaChapter::route('/{record}/edit'),
             'filter-images' => Pages\FilterImagesMangaChapter::route('/{record}/filtering'),
             'mask-verification' => Pages\MaskVerificationMangaChapter::route('/{record}/mask-verification'),
+            'clear-verification' => Pages\ClearVerificationMangaChapter::route('/{record}/clear-verification'),
         ];
     }
 }

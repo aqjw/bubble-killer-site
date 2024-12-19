@@ -130,33 +130,19 @@ def check_image_dimensions(img, min_dimensions):
     return width > min_width and height > min_height
 
 
-def save_segment(segment, min_dimensions, save_path, border=10, border_color='white'):
+def save_segment(segment, min_dimensions, save_path):
     # Remove whitespace
     new_segment = remove_image_whitespace(segment)
 
     # Check dimensions
     if check_image_dimensions(new_segment, min_dimensions):
-        new_segment.save(save_path)
+        new_segment.save(save_path, format="PNG", optimize=False)
         return True
-        #
-        # # Add border without overlapping the image
-        # width, height = new_segment.size
-        # new_canvas_size = (width + 2 * border, height + 2 * border)
-        #
-        # # Create new canvas with the border color
-        # bordered_image = Image.new('RGB', new_canvas_size, border_color)
-        #
-        # # Paste the original image onto the center of the new canvas
-        # bordered_image.paste(new_segment, (border, border))
-        #
-        # # Save the final image
-        # bordered_image.save(save_path)
-        # return True
 
     return False
 
 
-def process(images, output, min_dimensions):
+def process_split_images(images, output, min_dimensions):
     images_len = len(images)
     files = []
 
@@ -165,7 +151,7 @@ def process(images, output, min_dimensions):
 
     def get_file_name():
         """Формирует название изображения."""
-        return f"{saved_index:03d}.jpg"
+        return f"{saved_index:03d}.png"
 
     def get_save_path(prefix=''):
         """Формирует путь для сохранения сегмента изображения."""
@@ -217,7 +203,7 @@ def process(images, output, min_dimensions):
     return files
 
 
-def process_folder(dir_input, dir_output, min_dimensions):
+def split_images(dir_input, dir_output, min_dimensions):
     print(f"Processing folder: {dir_input}")
 
     # Загрузка изображений из директории
@@ -227,7 +213,57 @@ def process_folder(dir_input, dir_output, min_dimensions):
     Path(dir_output).mkdir(parents=True, exist_ok=True)
 
     # Обработка изображений
-    files = process(chapter_images, dir_output, min_dimensions)
+    files = process_split_images(chapter_images, dir_output, min_dimensions)
 
     return files
+
+
+# def process_split_list_images(images, images_path, output_path, min_dimensions):
+#     files = []
+
+#     for image_name in images:
+#         image_path = images_path / image_name
+#         img = Image.open(image_path)
+
+#         # Поиск разделителей на вертикальном изображении
+#         _, dividers = find_dividers(img, with_visual=False)
+
+#         if len(dividers) == 0:
+#             save_path = output_path / image_name
+#             if save_segment(img, min_dimensions, save_path):
+#                 files.append(image_name)
+#             continue
+
+#         # Разделение изображения на сегменты
+#         segments = split_image(img, dividers, min_dimensions)
+
+#         # Iterate through segments and add index to image name
+#         for index, segment in enumerate(segments, start=1):
+#             image_name = Path(image_name)
+#             # Add index to image name before extension
+#             indexed_image_name = f"{image_name.stem}-{index}{image_name.suffix}"
+#             save_path = output_path / indexed_image_name
+
+#             # Save segment and append file name if successful
+#             if save_segment(segment, min_dimensions, save_path):
+#                 files.append(indexed_image_name)
+
+#     return files
+
+
+# def split_list_images(images_dir, input_files, output_dir, min_dimensions):
+#     print(f"Processing folder: {images_dir}")
+
+#     #
+#     images = input_files.split(',')
+#     images_path = Path(images_dir)
+#     output_path = Path(output_dir)
+
+#     # Убедиться, что директория для сохранения существует
+#     output_path.mkdir(parents=True, exist_ok=True)
+
+#     # Обработка изображений
+#     files = process_split_list_images(images, images_path, output_path, min_dimensions)
+
+#     return files
 

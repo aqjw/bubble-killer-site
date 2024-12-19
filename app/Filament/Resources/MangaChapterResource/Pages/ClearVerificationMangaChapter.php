@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MangaChapterResource\Pages;
 
 use App\Filament\Resources\MangaChapterResource;
+use App\Jobs\Process\CreateFrameMasksJob;
 use App\Jobs\Process\RemoveBubblesJob;
 use Filament\Actions;
 use Filament\Actions\Action;
@@ -15,13 +16,13 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class MaskVerificationMangaChapter extends Page
+class ClearVerificationMangaChapter extends Page
 {
     use InteractsWithRecord;
 
     protected static string $resource = MangaChapterResource::class;
 
-    protected static string $view = 'filament.resources.manga-chapter-resource.pages.mask-verification';
+    protected static string $view = 'filament.resources.manga-chapter-resource.pages.clear-verification';
 
     public function getHeading(): string|Htmlable
     {
@@ -55,12 +56,34 @@ class MaskVerificationMangaChapter extends Page
             ->get()
             ->keyBy('name');
 
-        return $images->map(function ($image) use ($masks) {
+        $results = $this->record
+            ->media()
+            ->where('collection_name', 'clear')
+            ->whereIn('name', $imageNames)
+            ->get()
+            ->keyBy('name');
+
+        return $images->map(function ($image) use ($masks, $results) {
             $mask = $masks->get($image->name);
-            return ['image' => $image, 'mask' => $mask];
+            $result = $results->get($image->name);
+            return [
+                'image' => $image,
+                'mask' => $mask,
+                'result' => $result,
+                'remask' => $image->getCustomProperty('remask', false)
+            ];
         })->toArray();
     }
 
+    public function hasRemask(): bool
+    {
+        foreach ($this->items as $item) {
+            if ($item['remask']) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public function markDoneAction(): Action
     {
@@ -68,7 +91,11 @@ class MaskVerificationMangaChapter extends Page
             ->label('Готово')
             ->requiresConfirmation()
             ->action(function () {
-                dispatch(new RemoveBubblesJob(mangaChapterId: $this->record->id));
+                if ($this->hasRemask()) {
+                    dispatch(new RemoveBubblesJob(mangaChapterId: $this->record->id));
+                } else {
+                    dispatch(new CreateFrameMasksJob(mangaChapterId: $this->record->id));
+                }
 
                 Notification::make()
                     ->success()

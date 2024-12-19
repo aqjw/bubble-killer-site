@@ -4,11 +4,7 @@ namespace App\Filament\Resources\MangaChapterResource\Pages;
 
 use App\Filament\Resources\MangaChapterResource;
 use App\Jobs\Process\CreateBubbleMasksJob;
-use App\Jobs\Process\CreateMasksJob;
-use Filament\Actions;
 use Filament\Actions\Action;
-use Filament\Actions\Concerns\InteractsWithActions;
-use Filament\Actions\Contracts\HasActions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
