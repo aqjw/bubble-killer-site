@@ -4,11 +4,17 @@ namespace App\Filament\Resources\MangaChapterResource\Pages;
 
 use App\Filament\Resources\MangaChapterResource;
 use App\Jobs\Process\CreateBubbleMasksJob;
+use App\Jobs\Process\QualityImprovementJob;
+use App\Services\CropService;
+use App\Services\ImageSplitter;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class FilterImagesMangaChapter extends Page
@@ -41,47 +47,117 @@ class FilterImagesMangaChapter extends Page
             $this->data[$media->id] = [
                 'bubble' => $media->getCustomProperty('bubble', true),
                 'crop' => $media->getCustomProperty('crop', true),
-                'delete' => false,
             ];
         }
     }
 
-    public function willDeleteImage(int $image_id): bool
-    {
-        return $this->data[$image_id]['delete'] ?? false;
-    }
-
     public function getImagesProperty()
     {
-        return $this->record->media()->where('collection_name', 'split')->get();
+        return $this->record
+            ->media()
+            ->where('collection_name', 'split')
+            ->orderBy('order_column', 'asc')
+            ->get()
+            ->keyBy('id');
     }
 
-    public function hasUnsavedChanges(): bool
+    public function updated($name, $value): void
     {
-        foreach ($this->data as $image_id => $image_data) {
-            $media = $this->images->where('id', $image_id)->first();
-            if (! $media) {
-                continue;
-            }
+        if (preg_match('/^data\.(\d+)\.(\w+)$/', $name, $matches)) {
+            $id = $matches[1];
+            $property = $matches[2];
 
-            if (
-                $image_data['delete'] ||
-                $image_data['bubble'] !== $media->getCustomProperty('bubble', true) ||
-                $image_data['crop'] !== $media->getCustomProperty('crop', true)
-            ) {
-                return true;
+            if (isset($this->images[$id])) {
+                /** @var Media $media */
+                $media = $this->images[$id];
+
+                $media->setCustomProperty($property, $value);
+                $media->save();
             }
         }
-
-        return false;
     }
 
-    public function submitAction(): Action
+    public function splitImage(Media $image, array $data): void
     {
-        return Action::make('submit')
-            ->label('Сохранить')
+        $path = $image->getPath();
+        $angle = (int) $data['angle'];
+        $x = (int) round($data['x']);
+        $y = (int) round($data['y']);
+
+        $segments = app(ImageSplitter::class)->split($path, $angle, $x, $y);
+
+        Storage::disk($image->disk)
+            ->put($image->getPathRelativeToRoot(), file_get_contents($segments[0]));
+        $image->touch();
+
+        $this->shiftOrderForNextMedia($image->order_column + 1);
+
+        $name = $this->generateUniqueMediaName($image->name);
+
+        $media = $this->record
+            ->addMedia($segments[1])
+            ->preservingOriginal()
+            ->usingName($name)
+            ->setFileName("{$name}.png")
+            ->setOrder($image->order_column + 1)
+            ->withCustomProperties($image->custom_properties)
+            ->toMediaCollection('split');
+
+        $this->data[$media->id] = [
+            'bubble' => $media->getCustomProperty('bubble', true),
+            'crop' => $media->getCustomProperty('crop', true),
+        ];
+
+        // Удаляем временные файлы
+        File::delete($segments[0]);
+        File::delete($segments[1]);
+    }
+
+    private function generateUniqueMediaName(string $originalName): string
+    {
+        $number = 1;
+        $baseName = $originalName;
+
+        // Check if the name already has a -N suffix
+        if (preg_match('/-(\d+)$/', $originalName, $matches)) {
+            $number = (int) $matches[1] + 1;
+            $baseName = preg_replace('/-(\d+)$/', '', $originalName);
+        }
+
+        $name = "{$baseName}-{$number}";
+
+        // Increment the number until the name is unique
+        while ($this->record->media()->where('name', $name)->exists()) {
+            $number++;
+            $name = "{$baseName}-{$number}";
+        }
+
+        return $name;
+    }
+
+    private function shiftOrderForNextMedia(int $startOrder): void
+    {
+        $mediaItems = $this->record->media()
+            ->where('order_column', '>=', $startOrder)
+            ->where('collection_name', 'split')
+            ->orderBy('order_column', 'asc')
+            ->get();
+
+        foreach ($mediaItems as $media) {
+            $media->update(['order_column' => $media->order_column + 1]);
+        }
+    }
+
+    public function deleteImageAction(): Action
+    {
+        return Action::make('deleteImage')
+            ->label('Удалить')
+            ->color('danger')
             ->requiresConfirmation()
-            ->action(fn () => $this->submit());
+            ->action(function (array $arguments) {
+                $image = Media::find($arguments['image_id']);
+                $image->delete();
+            });
     }
 
     public function markDoneAction(): Action
@@ -89,38 +165,15 @@ class FilterImagesMangaChapter extends Page
         return Action::make('markDone')
             ->label('Готово')
             ->requiresConfirmation()
-            ->disabled($this->hasUnsavedChanges())
-            ->action(fn () => $this->markDone());
-    }
+            ->action(function () {
+                dispatch(new QualityImprovementJob(mangaChapterId: $this->record->id));
 
-    public function submit(): void
-    {
-        foreach ($this->data as $image_id => $image_data) {
-            $media = Media::find($image_id);
-            if ($image_data['delete']) {
-                $media->delete();
-            } else {
-                $media->setCustomProperty('bubble', $image_data['bubble']);
-                $media->setCustomProperty('crop', $image_data['crop']);
-                $media->save();
-            }
-        }
+                Notification::make()
+                    ->success()
+                    ->title('Картинки отправлены на обработку!')
+                    ->send();
 
-        Notification::make()
-            ->success()
-            ->title('Изменения успешно сохранены!')
-            ->send();
-    }
-
-    public function markDone(): void
-    {
-        dispatch(new CreateBubbleMasksJob(mangaChapterId: $this->record->id));
-
-        Notification::make()
-            ->success()
-            ->title('Картинки отправлены на обработку!')
-            ->send();
-
-        $this->redirect(MangaChapterResource::getUrl('index'));
+                $this->redirect(MangaChapterResource::getUrl('index'));
+            });
     }
 }

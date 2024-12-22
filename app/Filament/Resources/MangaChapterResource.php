@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Enums\MangaChapterStatus;
 use App\Filament\Resources\MangaChapterResource\Pages;
 use App\Filament\Resources\MangaChapterResource\RelationManagers;
+use App\Models\Manga;
 use App\Models\MangaChapter;
+use App\Services\MangaLibSearchService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -27,7 +29,30 @@ class MangaChapterResource extends Resource
                 Forms\Components\Select::make('manga_id')
                     ->label('Манхва')
                     ->relationship(name: 'manga', titleAttribute: 'title')
-                    ->required(),
+                    ->required()
+                    ->searchable()
+                    ->getSearchResultsUsing(function (string $search): array {
+                        $items = Manga::whereRaw('LOWER(title) LIKE ?', ['%' . strtolower($search) . '%'])
+                            ->limit(10)
+                            ->pluck('title', 'id')
+                            ->toArray();
+
+                        if (filled($items)) {
+                            return $items;
+                        }
+
+                        $result = app(MangaLibSearchService::class)->search($search);
+                        foreach ($result as $item) {
+                            $items[] = Manga::updateOrCreate(
+                                ['slug_mangalib' => $item['slug_url']],
+                                ['title' => $item['rus_name']]
+                            );
+                        }
+
+                        return collect($items)->pluck('title', 'id')->toArray();
+                    })
+                    ->getOptionLabelUsing(fn ($value): ?string => Manga::find($value)?->title),
+
                 Forms\Components\Group::make([
                     Forms\Components\TextInput::make('volume')
                         ->label('Том')

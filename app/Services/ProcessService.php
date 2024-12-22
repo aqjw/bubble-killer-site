@@ -72,7 +72,11 @@ class ProcessService
                     directory: $output,
                     files: $data['files'],
                     collectionName: 'split',
-                    disk: 'public'
+                    disk: 'public',
+                    properties: [
+                        'bubble' => true,
+                        'crop' => true,
+                    ]
                 );
 
                 return true;
@@ -140,7 +144,10 @@ class ProcessService
         $output = $input;
 
         $process = Process::forever()->run(
-            $this->getPythonPath() . " -m waifu2x.cli --tune animation --style art -n 3 -m noise_scale2x -i $input -o $output"
+            $this->getScriptsPath('improve_quality.py', [
+                'input' => $input,
+                'output' => $output
+            ])
         );
 
         if ($process->successful()) {

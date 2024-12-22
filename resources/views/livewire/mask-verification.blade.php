@@ -1,6 +1,9 @@
 @vite('resources/css/app.css')
 
-<div class="flex border-2 border-black dark:border-white mb-4 select-none">
+<div
+    x-load-js="[@js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('canvas-draw-tool'))]"
+    class="flex border-2 border-black dark:border-white mb-4 select-none"
+>
     <div class="w-4/6 border-r-2 border-black dark:border-white relative cursor-none">
         <img
             src="{{ $image->getUrl() }}"
@@ -100,15 +103,8 @@
     </div>
 </div>
 
-@assets
-    <script
-        src="{{ asset('js/livewire/mask-verification.js') }}"
-        defer
-    ></script>
-@endassets
-
 @script
     <script>
-        new CanvasTool({{ $image->id }}, $wire);
+        new CanvasDrawTool({{ $image->id }}, $wire);
     </script>
 @endscript

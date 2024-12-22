@@ -136,7 +136,9 @@ def save_segment(segment, min_dimensions, save_path):
 
     # Check dimensions
     if check_image_dimensions(new_segment, min_dimensions):
-        new_segment.save(save_path, format="PNG", optimize=False)
+        if new_segment.info.get("exif"):
+            new_segment.info.pop("exif")
+        new_segment.convert("RGB").save(save_path, format="PNG", optimize=False)
         return True
 
     return False

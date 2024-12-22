@@ -18,9 +18,9 @@ class FileRegistrationService
      * @param string $disk The storage disk name.
      * @return void
      */
-    public function registerFilesFromList(Model $model, string $directory, array $files, string $collectionName = 'default', string $disk = 'public'): void
+    public function registerFilesFromList(Model $model, string $directory, array $files, string $collectionName = 'default', string $disk = 'public', array $properties = []): void
     {
-        foreach ($files as $fileName) {
+        foreach ($files as $key => $fileName) {
             $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
 
             if (! File::exists($filePath)) {
@@ -39,6 +39,11 @@ class FileRegistrationService
                 'mime_type' => File::mimeType($filePath),
                 'disk' => $disk,
                 'size' => File::size($filePath),
+                'manipulations' => [],
+                'custom_properties' => $properties,
+                'generated_conversions' => [],
+                'responsive_images' => [],
+                'order_column' => $key + 1,
             ]);
         }
     }

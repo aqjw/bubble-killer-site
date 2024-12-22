@@ -1,7 +1,6 @@
 # - - - - - - - - - - - - - - - - -  General - - - - - - - - - - - - - - - - -
 numpy
 Pillow
-# lama-cleaner>=1.2.2
 IOPaint==1.5.3
 ultralytics
 

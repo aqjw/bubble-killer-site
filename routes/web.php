@@ -7,14 +7,20 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Middleware\DynamicThrottle;
 use App\Models\MangaChapter;
+use App\Services\MangaLibSearchService;
 use App\Services\ProcessService;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/test', function () {
-    $mangaChapter = MangaChapter::find(14);
-    $success = app(ProcessService::class)->processFrameMask($mangaChapter);
+    $mangalibSearch = app(MangaLibSearchService::class);
+    $result = $mangalibSearch->search('образование');
+    dd($result);
+
+    // $mangaChapter = MangaChapter::find(18);
+    // $success = app(ProcessService::class)->processSplit($mangaChapter);
+    // $success = app(ProcessService::class)->processImproveQuality($mangaChapter);
 });
 
 

@@ -1,4 +1,4 @@
-class CanvasTool {
+class CanvasDrawTool {
     constructor(imageId, $wire) {
         this.imageId = imageId;
         this.$wire = $wire;

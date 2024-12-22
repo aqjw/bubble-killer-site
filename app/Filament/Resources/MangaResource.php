@@ -36,9 +36,11 @@ class MangaResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID'),
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Название'),
+                    ->label('Название')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('slug_mangalib')
-                    ->label('MangaLib'),
+                    ->label('MangaLib')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('chapters_count')
                     ->counts('chapters')
                     ->label('Кол-во глав'),

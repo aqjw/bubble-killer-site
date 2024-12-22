@@ -28,10 +28,12 @@ class MangalibParser
 
     private function fetchChapterImages(string $titleSlug, int $volume, int $chapterNumber): array
     {
-        $response = Http::withHeaders($this->headers)->get("{$this->baseUrl}/$titleSlug/chapter", [
-            'number' => $chapterNumber,
-            'volume' => $volume,
-        ]);
+        $response = Http::withHeaders($this->headers)
+            ->timeout(60 * 5)
+            ->get("{$this->baseUrl}/$titleSlug/chapter", [
+                'number' => $chapterNumber,
+                'volume' => $volume,
+            ]);
 
         if ($response->failed()) {
             throw new \Exception("Failed to fetch images for $titleSlug: {$response->status()}");
@@ -45,7 +47,9 @@ class MangalibParser
     {
         foreach ($images as $index => $imageUrl) {
             $filename = sprintf('%03d', $index + 1);
-            $response = Http::withHeaders($this->headers)->get($imageUrl);
+            $response = Http::withHeaders($this->headers)
+                ->timeout(60 * 5)
+                ->get($imageUrl);
 
             if ($response->ok()) {
                 $mangaChapter
