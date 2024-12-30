@@ -73,6 +73,7 @@ class MangaChapterResource extends Resource
     {
         return $table
             ->defaultSort('id', 'desc')
+            ->poll()
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID'),

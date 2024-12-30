@@ -75,19 +75,19 @@ enum MangaChapterStatus: int implements HasLabel, HasColor
     public function getLabel(): string
     {
         return match ($this->value) {
-            self::Pending->value => 'Waiting in Queue',
-            self::ImageParsing->value => 'Parsing Images',
-            self::ImageSplitting->value => 'Splitting Images',
-            self::ImageFiltering->value => 'Filtering Unnecessary Images',
-            self::QualityImprovement->value => 'Quality Improvement',
-            self::MaskCreation->value => 'Creating Masks',
-            self::MaskVerification->value => 'Mask Verification',
-            self::BubbleRemoval->value => 'Removing Bubbles',
-            self::ClearVerification->value => 'Clear Verification',
-            self::FrameMaskCreation->value => 'Creating Frame Masks',
-            self::FrameMaskVerification->value => 'Verifying Frame Masks',
-            self::FrameCropping->value => 'Reviewing Cropped Images',
-            self::Finalized->value => 'Finalized',
+            self::Pending->value => 'В очереди',
+            self::ImageParsing->value => 'Парсинг изображений',
+            self::ImageSplitting->value => 'Разделение изображений',
+            self::ImageFiltering->value => 'Фильтрация изображений',
+            self::QualityImprovement->value => 'Улучшение качества',
+            self::MaskCreation->value => 'Создание масок',
+            self::MaskVerification->value => 'Проверка масок',
+            self::BubbleRemoval->value => 'Удаление пузырей',
+            self::ClearVerification->value => 'Проверка очистки',
+            self::FrameMaskCreation->value => 'Создание масок кадров',
+            self::FrameMaskVerification->value => 'Проверка масок кадров',
+            self::FrameCropping->value => 'Обрезка кадров',
+            self::Finalized->value => 'Готово',
         };
     }
 

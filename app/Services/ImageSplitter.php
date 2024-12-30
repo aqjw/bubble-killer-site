@@ -4,10 +4,20 @@ namespace App\Services;
 
 class ImageSplitter
 {
+    public static function loadImage(string $path)
+    {
+        $imageType = exif_imagetype($path);
+        return match ($imageType) {
+            IMAGETYPE_PNG => imagecreatefrompng($path),
+            IMAGETYPE_JPEG => imagecreatefromjpeg($path),
+            IMAGETYPE_GIF => imagecreatefromgif($path),
+        };
+    }
+
     public function split(string $path, int $angle, int $x, int $y): array
     {
         // Load the image
-        $sourceImage = imagecreatefrompng($path);
+        $sourceImage = $this->loadImage($path);
 
         if (! $sourceImage) {
             throw new \RuntimeException('Failed to load image from path: ' . $path);
@@ -31,16 +41,34 @@ class ImageSplitter
 
         // Loop through pixels and split with an offset based on angle
         for ($px = 0; $px < $width; $px++) {
-            $offset = (int) (($px - $x) * tan(deg2rad($angle)) + $y);
-            for ($py = 0; $py < $height; $py++) {
-                $color = imagecolorat($sourceImage, $px, $py);
-                if ($py < $offset) {
-                    imagesetpixel($part1, $px, $py, $color);
-                } else {
-                    imagesetpixel($part2, $px, $py, $color);
+            // Если угол близок к вертикальному (90 или 270 градусов)
+            if (abs($angle - 90) < 1 || abs($angle - 270) < 1) {
+                // Разделяем по вертикальной линии (x - координата разделения)
+                for ($py = 0; $py < $height; $py++) {
+                    $color = imagecolorat($sourceImage, $px, $py);
+
+                    if ($px < $x) {
+                        imagesetpixel($part1, $px, $py, $color);
+                    } else {
+                        imagesetpixel($part2, $px, $py, $color);
+                    }
+                }
+            } else {
+                // Для наклонного разделения
+                $offset = (int) (($px - $x) * tan(deg2rad($angle)) + $y);
+
+                for ($py = 0; $py < $height; $py++) {
+                    $color = imagecolorat($sourceImage, $px, $py);
+
+                    if ($py < $offset) {
+                        imagesetpixel($part1, $px, $py, $color);
+                    } else {
+                        imagesetpixel($part2, $px, $py, $color);
+                    }
                 }
             }
         }
+
 
         // Remove whitespace from parts
         $part1 = $this->removeWhitespace($part1);
@@ -76,7 +104,7 @@ class ImageSplitter
         return [$part1Path, $part2Path];
     }
 
-    private function removeWhitespace($img, $tolerance = 5)
+    private function removeWhitespace($img, $tolerance = 3)
     {
         // Проверяем, является ли изображение true color, если нет - конвертируем
         if (! imageistruecolor($img)) {
@@ -189,7 +217,6 @@ class ImageSplitter
         return $trueColorImg;
     }
 
-    // Вспомогательная функция для расчета стандартного отклонения
     private function calculateStandardDeviation(array $values): float
     {
         $mean = array_sum($values) / count($values);

@@ -12,6 +12,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -85,6 +86,11 @@ class ClearVerificationMangaChapter extends Page
         return false;
     }
 
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
+
     public function markDoneAction(): Action
     {
         return Action::make('markDone')
@@ -94,7 +100,9 @@ class ClearVerificationMangaChapter extends Page
                 if ($this->hasRemask()) {
                     dispatch(new RemoveBubblesJob(mangaChapterId: $this->record->id));
                 } else {
-                    dispatch(new CreateFrameMasksJob(mangaChapterId: $this->record->id));
+                    $this->record->update(['status' => \App\Enums\MangaChapterStatus::FrameMaskCreation]);
+                    // TODO: uncomment original
+                    // dispatch(new CreateFrameMasksJob(mangaChapterId: $this->record->id));
                 }
 
                 Notification::make()

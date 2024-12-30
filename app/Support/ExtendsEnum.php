@@ -21,6 +21,16 @@ trait ExtendsEnum
         return $this->value === ($enum instanceof UnitEnum ? $enum->value : $enum);
     }
 
+    public function in(array $cases): bool
+    {
+        foreach ($cases as $case) {
+            if ($this->is($case)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getName(): ?string
     {
         foreach (self::mapped() as $name => $enum) {

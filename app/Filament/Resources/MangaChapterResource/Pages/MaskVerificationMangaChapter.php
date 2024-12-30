@@ -11,6 +11,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use Filament\Resources\Pages\Page;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -61,6 +62,10 @@ class MaskVerificationMangaChapter extends Page
         })->toArray();
     }
 
+    public function getMaxContentWidth(): MaxWidth
+    {
+        return MaxWidth::Full;
+    }
 
     public function markDoneAction(): Action
     {
@@ -68,8 +73,10 @@ class MaskVerificationMangaChapter extends Page
             ->label('Готово')
             ->requiresConfirmation()
             ->action(function () {
-                dispatch(new RemoveBubblesJob(mangaChapterId: $this->record->id));
-
+                $this->record->update(['status' => \App\Enums\MangaChapterStatus::BubbleRemoval]);
+                // TODO: uncomment original
+                // dispatch(new RemoveBubblesJob(mangaChapterId: $this->record->id));
+    
                 Notification::make()
                     ->success()
                     ->title('Картинки отправлены на обработку!')

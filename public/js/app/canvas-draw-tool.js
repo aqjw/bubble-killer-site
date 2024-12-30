@@ -3,6 +3,7 @@ class CanvasDrawTool {
         this.imageId = imageId;
         this.$wire = $wire;
         this.savedState = {};
+        this.autoSaveTimer = null;
 
         this.canvas = document.getElementById(`canvas-${imageId}`);
         this.toolModes = document.querySelectorAll(
@@ -53,16 +54,28 @@ class CanvasDrawTool {
             this.canvas.style.opacity = +e.target.value / 100;
         });
 
-        this.saveMaskBtn.addEventListener("click", async () => {
-            this.saveCanvasState();
-            this.saveMaskBtn.style.display = "none";
+        this.saveMaskBtn.addEventListener("click", () => this.saveMask());
 
+        this.initCanvasDrawingEvents();
+    }
+
+    startAutoSaveTimer() {
+        clearTimeout(this.autoSaveTimer);
+        this.autoSaveTimer = setTimeout(() => this.saveMask(), 10000);
+    }
+
+    saveMask() {
+        console.log("this", this);
+        clearTimeout(this.autoSaveTimer);
+        this.saveCanvasState();
+        this.saveMaskBtn.style.display = "none";
+
+        const save = async () => {
             const base64 = this.canvas.toDataURL();
             await this.$wire.saveMask(base64);
             this.updateMask(base64);
-        });
-
-        this.initCanvasDrawingEvents();
+        };
+        save();
     }
 
     initCanvasDrawingEvents() {
@@ -81,6 +94,8 @@ class CanvasDrawTool {
 
         this.canvas.addEventListener("mousedown", (e) => {
             drawing = true;
+            this.startAutoSaveTimer();
+
             const { x, y } = this.getCoords(e);
 
             this.saveMaskBtn.style.display = "block";
@@ -103,6 +118,8 @@ class CanvasDrawTool {
             this.moveCursor(e.clientX, e.clientY);
 
             if (!drawing) return;
+
+            this.startAutoSaveTimer();
 
             const { x, y } = this.getCoords(e);
 

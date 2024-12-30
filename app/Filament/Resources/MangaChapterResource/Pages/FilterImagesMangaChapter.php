@@ -166,8 +166,11 @@ class FilterImagesMangaChapter extends Page
             ->label('Готово')
             ->requiresConfirmation()
             ->action(function () {
-                dispatch(new QualityImprovementJob(mangaChapterId: $this->record->id));
-
+                // $this->record->update(['status' => \App\Enums\MangaChapterStatus::QualityImprovement]);
+                dispatch(new CreateBubbleMasksJob(mangaChapterId: $this->record->id));
+                // TODO: uncomment original
+                // dispatch(new QualityImprovementJob(mangaChapterId: $this->record->id));
+    
                 Notification::make()
                     ->success()
                     ->title('Картинки отправлены на обработку!')
