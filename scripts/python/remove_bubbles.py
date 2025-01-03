@@ -24,7 +24,7 @@ def parse_arguments():
 
 def process(images_dir, masks_dir, input_files, output_dir):
     # lama,ldm,zits,mat,fcf,sd1.5,anything4,realisticVision1.4,cv2,manga,sd2,paint_by_example,instruct_pix2pix
-    model = "lama"
+    model = "anime-lama"
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     images_path = Path(images_dir)
     masks_path = Path(masks_dir)
